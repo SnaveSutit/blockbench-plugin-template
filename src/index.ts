@@ -4,7 +4,7 @@ const PACKAGE = require('../package.json')
 
 BBPlugin.register(PACKAGE.name, {
 	title: PACKAGE.title,
-	author: PACKAGE.author,
+	author: PACKAGE.author.name,
 	description: PACKAGE.description,
 	icon: 'create_session',
 	variant: 'desktop',
