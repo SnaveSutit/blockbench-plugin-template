@@ -1,6 +1,6 @@
+import * as PACKAGE from '../package.json'
 import * as events from './events'
 import './mods'
-const PACKAGE = require('../package.json')
 
 BBPlugin.register(PACKAGE.name, {
 	title: PACKAGE.title,

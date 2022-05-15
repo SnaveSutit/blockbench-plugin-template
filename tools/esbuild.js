@@ -4,6 +4,10 @@ const PACKAGE = require('../package.json')
 
 let infoPlugin = {
 	name: 'infoPlugin',
+	/**
+	 *
+	 * @param {esbuild.PluginBuild} build
+	 */
 	setup(build) {
 		let start = Date.now()
 		build.onStart(() => {
@@ -18,10 +22,23 @@ let infoPlugin = {
 				`\u{2705} Build completed in ${diff}ms with ${result.warnings.length} warnings and ${result.errors.length} errors.`
 			)
 		})
+
+		build.onLoad(
+			{
+				filter: /\.[tj]sx?$/,
+			},
+			result => {
+				const code = fs.readFileSync(result.path, 'utf-8')
+				return {
+					contents: 'const devlog = console.log;\n' + code,
+					loader: 'ts',
+				}
+			}
+		)
 	},
 }
 
-function createBanner() {
+function createBanner(dev) {
 	const LICENSE = fs.readFileSync('./LICENSE').toString()
 
 	let lines = [
@@ -44,13 +61,12 @@ function createBanner() {
 	let header = `-`.repeat(maxLength + 4)
 	let footer = `-`.repeat(maxLength + 4)
 
-	lines =
-		lines.map(v => {
-			const div = v.length / 2
-			const l = Math.floor(leftBuffer - div)
-			const r = Math.ceil(rightBuffer - div)
-			return '| ' + ' '.repeat(l) + v + ' '.repeat(r) + ' |'
-		})
+	lines = lines.map(v => {
+		const div = v.length / 2
+		const l = Math.floor(leftBuffer - div)
+		const r = Math.ceil(rightBuffer - div)
+		return '| ' + ' '.repeat(l) + v + ' '.repeat(r) + ' |'
+	})
 
 	let banner = '\n' + [header, ...lines, footer].map(v => `// ${v}`).join('\n') + '\n'
 
@@ -69,7 +85,8 @@ function buildDev() {
 		platform: 'node',
 		sourcemap: true,
 		plugins: [infoPlugin],
-		watch: true
+		watch: true,
+		format: 'iife',
 	})
 }
 
@@ -84,6 +101,8 @@ function buildProd() {
 		sourcemap: false,
 		plugins: [infoPlugin],
 		banner: createBanner(),
+		drop: ['debugger'],
+		format: 'iife',
 	})
 }
 
