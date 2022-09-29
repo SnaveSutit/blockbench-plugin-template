@@ -22,9 +22,8 @@
 		"lint": "prettier --write ."
 	},
 	"devDependencies": {
-		"@types/js-yaml": "^4.0.5",
 		"@types/node": "^17.0.21",
-		"blockbench-types": "^4.2.0",
+		"blockbench-types": "^4.4.0",
 		"esbuild": "^0.14.39",
 		"prettier": "^2.5.1",
 		"ts-loader": "^9.2.6",
