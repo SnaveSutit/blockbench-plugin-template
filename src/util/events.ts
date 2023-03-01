@@ -1,4 +1,6 @@
+import { consoleGroupCollapsed } from './console'
 import { Subscribable } from './subscribable'
+import * as PACKAGE from '../../package.json'
 
 export class PluginEvent<T = void> extends Subscribable<T> {
 	protected static events: Record<string, PluginEvent<any>> = {}
@@ -14,10 +16,18 @@ export const unload = new PluginEvent('unload')
 export const install = new PluginEvent('install')
 export const uninstall = new PluginEvent('uninstall')
 
-export const loadMods = new PluginEvent('loadMods')
-export const unloadMods = new PluginEvent('unloadMods')
+export const injectMods = new PluginEvent('injectMods')
+export const extractMods = new PluginEvent('extractMods')
 
-load.subscribe(loadMods.dispatch)
-unload.subscribe(unloadMods.dispatch)
-install.subscribe(loadMods.dispatch)
-uninstall.subscribe(unloadMods.dispatch)
+const injectHandler = consoleGroupCollapsed(
+	`Injecting BlockbenchMods added by ${PACKAGE.name}`,
+	() => injectMods.dispatch()
+)
+const extractHandler = consoleGroupCollapsed(
+	`Extracting BlockbenchMods added by ${PACKAGE.name}`,
+	() => extractMods.dispatch()
+)
+load.subscribe(injectHandler)
+unload.subscribe(extractHandler)
+install.subscribe(injectHandler)
+uninstall.subscribe(extractHandler)
