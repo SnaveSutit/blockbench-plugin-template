@@ -1,8 +1,15 @@
-const fs = require('fs')
-const esbuild = require('esbuild')
-const PACKAGE = require('../package.json')
+if (process.argv.includes('--mode=dev')) {
+	process.env.NODE_ENV = 'development'
+} else {
+	process.env.NODE_ENV = 'production'
+}
 
-let infoPlugin = {
+import * as fs from 'fs'
+import * as esbuild from 'esbuild'
+
+const PACKAGE = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
+
+let infoPlugin: esbuild.Plugin = {
 	name: 'infoPlugin',
 	/**
 	 *
@@ -22,23 +29,10 @@ let infoPlugin = {
 				`\u{2705} Build completed in ${diff}ms with ${result.warnings.length} warnings and ${result.errors.length} errors.`
 			)
 		})
-
-		build.onLoad(
-			{
-				filter: /\.[tj]sx?$/,
-			},
-			result => {
-				const code = fs.readFileSync(result.path, 'utf-8')
-				return {
-					contents: 'const devlog = console.log;\n' + code,
-					loader: 'ts',
-				}
-			}
-		)
 	},
 }
 
-function createBanner(dev) {
+function createBanner() {
 	const LICENSE = fs.readFileSync('./LICENSE').toString()
 
 	let lines = [
@@ -54,18 +48,18 @@ function createBanner(dev) {
 		...LICENSE.split('\n').map(v => v.trim()),
 	]
 
-	let maxLength = JSON.parse(JSON.stringify(lines)).sort((a, b) => b.length - a.length)[0].length
+	let maxLength = Math.max(...lines.map(line => line.length))
 	const leftBuffer = Math.floor(maxLength / 2)
 	const rightBuffer = Math.ceil(maxLength / 2)
 
-	let header = `-`.repeat(maxLength + 4)
-	let footer = `-`.repeat(maxLength + 4)
+	let header = '╭' + `─`.repeat(maxLength + 2) + '╮'
+	let footer = '╰' + `─`.repeat(maxLength + 2) + '╯'
 
 	lines = lines.map(v => {
 		const div = v.length / 2
 		const l = Math.floor(leftBuffer - div)
 		const r = Math.ceil(rightBuffer - div)
-		return '| ' + ' '.repeat(l) + v + ' '.repeat(r) + ' |'
+		return '│ ' + ' '.repeat(l) + v + ' '.repeat(r) + ' │'
 	})
 
 	let banner = '\n' + [header, ...lines, footer].map(v => `// ${v}`).join('\n') + '\n'
@@ -75,9 +69,8 @@ function createBanner(dev) {
 	}
 }
 
-function buildDev() {
-	esbuild.transformSync('function devlog(message) {console.log(message)}')
-	esbuild.build({
+async function buildDev() {
+	const ctx = await esbuild.context({
 		entryPoints: ['./src/index.ts'],
 		outfile: `./dist/${PACKAGE.name}.js`,
 		bundle: true,
@@ -85,13 +78,12 @@ function buildDev() {
 		platform: 'node',
 		sourcemap: true,
 		plugins: [infoPlugin],
-		watch: true,
 		format: 'iife',
 	})
+	ctx.watch()
 }
 
-function buildProd() {
-	esbuild.transformSync('function devlog(message) {}')
+async function buildProd() {
 	esbuild.build({
 		entryPoints: ['./src/index.ts'],
 		outfile: `./dist/${PACKAGE.name}.js`,

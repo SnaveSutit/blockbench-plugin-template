@@ -1,6 +1,11 @@
 import * as PACKAGE from '../package.json'
-import * as events from './events'
-import './mods'
+import { consoleGroupCollapsed } from './util/console'
+import * as events from './util/events'
+import './util/mods'
+
+// Expose this plugin's events to other plugins
+// @ts-ignore
+globalThis[PACKAGE.name].events = events
 
 BBPlugin.register(PACKAGE.name, {
 	title: PACKAGE.title,
@@ -8,24 +13,19 @@ BBPlugin.register(PACKAGE.name, {
 	description: PACKAGE.description,
 	icon: 'create_session',
 	variant: 'desktop',
-	// @ts-ignore // Blockbench types are outdated >:I
 	version: PACKAGE.version,
 	min_version: PACKAGE.min_blockbench_version,
-	tags: ['Tag 1', 'Tag 2', 'Tag 3'],
-	onload() {
-		devlog(`${PACKAGE.name} loaded!`)
-		events.load.trigger()
-	},
-	onunload() {
-		devlog(`${PACKAGE.name} unloaded!`)
-		events.unload.trigger()
-	},
-	oninstall() {
-		devlog(`${PACKAGE.name} installed!`)
-		events.install.trigger()
-	},
-	onuninstall() {
-		devlog(`${PACKAGE.name} uninstalled!`)
-		events.uninstall.trigger()
-	},
+	tags: PACKAGE.tags as [string, string, string],
+	onload: consoleGroupCollapsed(`${PACKAGE.name}:onload`, () => {
+		events.load.dispatch()
+	}),
+	onunload: consoleGroupCollapsed(`${PACKAGE.name}:onunload`, () => {
+		events.unload.dispatch()
+	}),
+	oninstall: consoleGroupCollapsed(`${PACKAGE.name}:oninstall`, () => {
+		events.install.dispatch()
+	}),
+	onuninstall: consoleGroupCollapsed(`${PACKAGE.name}:onuninstall`, () => {
+		events.uninstall.dispatch()
+	}),
 })
