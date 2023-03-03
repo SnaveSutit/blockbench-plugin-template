@@ -1,11 +1,11 @@
 import * as PACKAGE from '../package.json'
 import { consoleGroupCollapsed } from './util/console'
 import * as events from './util/events'
-import './util/mods'
+import './util/moddingTools'
 
 // Expose this plugin's events to other plugins
 // @ts-ignore
-globalThis[PACKAGE.name].events = events
+global[PACKAGE.name].events = events
 
 BBPlugin.register(PACKAGE.name, {
 	title: PACKAGE.title,
@@ -17,15 +17,15 @@ BBPlugin.register(PACKAGE.name, {
 	min_version: PACKAGE.min_blockbench_version,
 	tags: PACKAGE.tags as [string, string, string],
 	onload: consoleGroupCollapsed(`${PACKAGE.name}:onload`, () => {
-		events.load.dispatch()
+		events.LOAD.dispatch()
 	}),
 	onunload: consoleGroupCollapsed(`${PACKAGE.name}:onunload`, () => {
-		events.unload.dispatch()
+		events.UNLOAD.dispatch()
 	}),
 	oninstall: consoleGroupCollapsed(`${PACKAGE.name}:oninstall`, () => {
-		events.install.dispatch()
+		events.INSTALL.dispatch()
 	}),
 	onuninstall: consoleGroupCollapsed(`${PACKAGE.name}:onuninstall`, () => {
-		events.uninstall.dispatch()
+		events.UNINSTALL.dispatch()
 	}),
 })

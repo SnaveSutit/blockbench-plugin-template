@@ -7,9 +7,11 @@ if (process.argv.includes('--mode=dev')) {
 import * as fs from 'fs'
 import * as esbuild from 'esbuild'
 
-const PACKAGE = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
+import * as PACKAGE from '../package.json'
 
-let infoPlugin: esbuild.Plugin = {
+// const PACKAGE = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
+
+const INFO_PLUGIN: esbuild.Plugin = {
 	name: 'infoPlugin',
 	/**
 	 *
@@ -23,7 +25,7 @@ let infoPlugin: esbuild.Plugin = {
 		})
 
 		build.onEnd(result => {
-			let end = Date.now()
+			const end = Date.now()
 			const diff = end - start
 			console.log(
 				`\u{2705} Build completed in ${diff}ms with ${result.warnings.length} warnings and ${result.errors.length} errors.`
@@ -33,7 +35,7 @@ let infoPlugin: esbuild.Plugin = {
 }
 
 function createBanner() {
-	const LICENSE = fs.readFileSync('./LICENSE').toString()
+	const license = fs.readFileSync('./LICENSE').toString()
 
 	let lines = [
 		`[ ${PACKAGE.title} ]`,
@@ -45,15 +47,15 @@ function createBanner() {
 		`${PACKAGE.repository.url}`,
 		``,
 		`[ LICENSE ]`,
-		...LICENSE.split('\n').map(v => v.trim()),
+		...license.split('\n').map(v => v.trim()),
 	]
 
-	let maxLength = Math.max(...lines.map(line => line.length))
+	const maxLength = Math.max(...lines.map(line => line.length))
 	const leftBuffer = Math.floor(maxLength / 2)
 	const rightBuffer = Math.ceil(maxLength / 2)
 
-	let header = '╭' + `─`.repeat(maxLength + 2) + '╮'
-	let footer = '╰' + `─`.repeat(maxLength + 2) + '╯'
+	const header = '╭' + `─`.repeat(maxLength + 2) + '╮'
+	const footer = '╰' + `─`.repeat(maxLength + 2) + '╯'
 
 	lines = lines.map(v => {
 		const div = v.length / 2
@@ -62,7 +64,7 @@ function createBanner() {
 		return '│ ' + ' '.repeat(l) + v + ' '.repeat(r) + ' │'
 	})
 
-	let banner = '\n' + [header, ...lines, footer].map(v => `// ${v}`).join('\n') + '\n'
+	const banner = '\n' + [header, ...lines, footer].map(v => `// ${v}`).join('\n') + '\n'
 
 	return {
 		js: banner,
@@ -77,33 +79,33 @@ async function buildDev() {
 		minify: false,
 		platform: 'node',
 		sourcemap: true,
-		plugins: [infoPlugin],
+		plugins: [INFO_PLUGIN],
 		format: 'iife',
 	})
-	ctx.watch()
+	await ctx.watch()
 }
 
 async function buildProd() {
-	esbuild.build({
+	await esbuild.build({
 		entryPoints: ['./src/index.ts'],
 		outfile: `./dist/${PACKAGE.name}.js`,
 		bundle: true,
 		minify: true,
 		platform: 'node',
 		sourcemap: false,
-		plugins: [infoPlugin],
+		plugins: [INFO_PLUGIN],
 		banner: createBanner(),
 		drop: ['debugger'],
 		format: 'iife',
 	})
 }
 
-function main() {
+async function main() {
 	if (process.argv.includes('--mode=dev')) {
-		buildDev()
+		await buildDev()
 		return
 	}
-	buildProd()
+	await buildProd()
 }
 
-main()
+void main()
