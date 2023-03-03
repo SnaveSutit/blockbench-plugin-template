@@ -2,7 +2,7 @@ import { consoleGroup } from './console'
 import * as events from './events'
 import { Subscribable } from './subscribable'
 
-type NamespacedString = `${string}${string}:${string}${string}`
+export type NamespacedString = `${string}${string}:${string}${string}`
 
 class BlockbenchModInstallError extends Error {
 	constructor(id: string, err: Error) {
