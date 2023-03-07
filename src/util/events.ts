@@ -10,6 +10,7 @@ export class PluginEvent<EventData = void> extends Subscribable<EventData> {
 	}
 }
 
+// Plugin Events
 export const LOAD = new PluginEvent('load')
 export const UNLOAD = new PluginEvent('unload')
 export const INSTALL = new PluginEvent('install')

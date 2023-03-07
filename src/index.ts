@@ -3,9 +3,15 @@ import { consoleGroupCollapsed } from './util/console'
 import * as events from './util/events'
 import './util/moddingTools'
 
-// Expose this plugin's events to other plugins
+//-------------------------------
+// Import your source files here
+//-------------------------------
+
+// Expose this plugin's events globally and to other plugins
 // @ts-ignore
-global[PACKAGE.name].events = events
+globalThis.BlockbenchPluginTemplate = {
+	events: events,
+}
 
 BBPlugin.register(PACKAGE.name, {
 	title: PACKAGE.title,
