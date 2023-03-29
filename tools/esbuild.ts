@@ -6,7 +6,8 @@ if (process.argv.includes('--mode=dev')) {
 
 import * as fs from 'fs'
 import * as esbuild from 'esbuild'
-
+import sveltePlugin from './plugins/sveltePlugin'
+import svelteConfig from '../svelte.config'
 import * as PACKAGE from '../package.json'
 
 // const PACKAGE = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
@@ -79,7 +80,7 @@ async function buildDev() {
 		minify: false,
 		platform: 'node',
 		sourcemap: true,
-		plugins: [INFO_PLUGIN],
+		plugins: [INFO_PLUGIN, sveltePlugin(svelteConfig)],
 		format: 'iife',
 	})
 	await ctx.watch()
@@ -93,7 +94,7 @@ async function buildProd() {
 		minify: true,
 		platform: 'node',
 		sourcemap: false,
-		plugins: [INFO_PLUGIN],
+		plugins: [INFO_PLUGIN, sveltePlugin(svelteConfig)],
 		banner: createBanner(),
 		drop: ['debugger'],
 		format: 'iife',

@@ -6,6 +6,7 @@ import './util/moddingTools'
 //-------------------------------
 // Import your source files here
 //-------------------------------
+import './dialogs/exampleDialog'
 
 // Expose this plugin's events globally and to other plugins
 // @ts-ignore
