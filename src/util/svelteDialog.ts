@@ -26,13 +26,12 @@ export class SvelteDialog extends Dialog {
 		this.onOpen = () => {
 			const parentElement = mount.parentElement
 			if (this.instance || !parentElement) return
-			// console.log('onOpen')
 			parentElement.style.overflow = 'visible'
 			this.instance = new options.svelteComponent({
 				target: parentElement,
 				props: options.svelteComponentProps,
 			})
-			if (super.onOpen) super.onOpen()
+			if (options.onOpen) options.onOpen()
 			if (!options.stackable) {
 				DIALOG_STACK.forEach(v => v.cancel())
 				DIALOG_STACK.empty()
@@ -42,19 +41,17 @@ export class SvelteDialog extends Dialog {
 
 		this.onButton = (...args) => {
 			if (!this.instance) return
-			// console.log('onButton')
 			this.instance.$destroy()
 			this.instance = undefined
-			if (super.onButton) super.onButton(...args)
+			if (options.onButton) options.onButton(...args)
 			if (options.onClose) options.onClose()
 		}
 
 		this.onCancel = (...args) => {
 			if (!this.instance) return
-			// console.log('onCancel')
 			this.instance.$destroy()
 			this.instance = undefined
-			if (super.onCancel) super.onCancel(...args)
+			if (options.onCancel) options.onCancel(...args)
 			if (options.onClose) options.onClose()
 		}
 	}
