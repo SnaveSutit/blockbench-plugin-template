@@ -1,7 +1,6 @@
-import * as events from './util/events'
+/// <reference path="blockbenchTypeMods.d.ts" />
 
-declare global {
-	const BlockbenchPluginTemplate: {
-		events: typeof events
-	}
+declare module '*.png' {
+	const value: string
+	export = value
 }

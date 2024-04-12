@@ -5,14 +5,23 @@ import { createBlockbenchMod } from '../util/moddingTools'
 export function injectSvelteCompomponent(options: {
 	// @ts-ignore
 	svelteComponent: SvelteComponentConstructor<SvelteComponent, any>
-	svelteComponentArgs: Record<string, any>
+	svelteComponentProperties: Record<string, any>
+	/**
+	 * A function that returns the element to inject the svelte component into.
+	 */
 	elementSelector: () => Element | undefined | null
+	prepend?: boolean
 	postMount?: (el: Element) => void
 }) {
 	void pollPromise(options.elementSelector).then(el => {
+		let anchor = undefined
+		if (options.prepend) {
+			anchor = el.children[0]
+		}
 		new options.svelteComponent({
 			target: el,
-			props: options.svelteComponentArgs,
+			anchor,
+			props: options.svelteComponentProperties,
 		})
 		if (options.postMount) options.postMount(el)
 	})
@@ -21,8 +30,9 @@ export function injectSvelteCompomponent(options: {
 export function injectSvelteCompomponentMod(options: {
 	// @ts-ignore
 	svelteComponent: SvelteComponentConstructor<SvelteComponent, any>
-	svelteComponentArgs: Record<string, any>
+	svelteComponentProperties: Record<string, any>
 	elementSelector: () => Element | undefined | null
+	prepend?: boolean
 	postMount?: (el: Element) => void
 }) {
 	createBlockbenchMod(
@@ -33,9 +43,14 @@ export function injectSvelteCompomponentMod(options: {
 		() => {
 			let instance: SvelteComponent | undefined
 			void pollPromise(options.elementSelector).then(el => {
+				let anchor = undefined
+				if (options.prepend) {
+					anchor = el.children[0]
+				}
 				instance = new options.svelteComponent({
 					target: el,
-					props: options.svelteComponentArgs,
+					anchor,
+					props: options.svelteComponentProperties,
 				})
 				if (options.postMount) options.postMount(el)
 			})

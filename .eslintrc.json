@@ -35,6 +35,7 @@
 		"@typescript-eslint/ban-types": "warn",
 		"@typescript-eslint/consistent-indexed-object-style": ["warn", "record"],
 		"@typescript-eslint/consistent-generic-constructors": "warn",
+		"@typescript-eslint/triple-slash-reference": "off",
 		"@typescript-eslint/naming-convention": [
 			"warn",
 			{

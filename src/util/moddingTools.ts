@@ -1,8 +1,26 @@
-import { consoleGroup } from './console'
-import * as events from './events'
+import { events } from './events'
 import { Subscribable } from './subscribable'
 
 export type NamespacedString = `${string}${string}:${string}${string}`
+/**
+ * Shorthand to mark a context variable as a Property.
+ *
+ * ```
+ * createBlockbenchMod(
+ * 	'my-plugin-id:my-mod',
+ * 	{
+ * 		myProperty: undefined as ContextProperty<'string'>
+ * 	},
+ * 	context => {
+ * 		context.myProperty = new Property(Cube, 'my_property', 'string', 'my_default_value')
+ * 		return context
+ * 	},
+ * 	context => {
+ * 		context.myProperty?.delete()
+ * 	})
+ * ```
+ */
+export type ContextProperty<Type extends keyof IPropertyType> = Property<Type> | undefined
 
 class BlockbenchModInstallError extends Error {
 	constructor(id: string, err: Error) {
@@ -58,33 +76,29 @@ export function createBlockbenchMod<InjectContext = any, ExtractContext = any>(
 	let installed = false
 	let extractContext: ExtractContext
 
-	events.INJECT_MODS.subscribe(
-		consoleGroup(`Injecting BBMod '${id}'`, () => {
-			try {
-				if (installed) new Error('Mod is already installed!')
-				extractContext = inject(context)
-				installed = true
-			} catch (err) {
-				throw new BlockbenchModInstallError(id, err as Error)
-			}
-			console.log('Sucess!')
-		}),
-		true
-	)
+	events.INJECT_MODS.subscribe(() => {
+		console.log(`Injecting BBMod '${id}'`)
+		try {
+			if (installed) new Error('Mod is already installed!')
+			extractContext = inject(context)
+			installed = true
+		} catch (err) {
+			throw new BlockbenchModInstallError(id, err as Error)
+		}
+		console.log('Sucess!')
+	})
 
-	events.EXTRACT_MODS.subscribe(
-		consoleGroup(`Extracting BBMod '${id}'`, () => {
-			try {
-				if (!installed) new Error('Mod is not installed!')
-				extract(extractContext)
-				installed = false
-			} catch (err) {
-				throw new BlockbenchModUninstallError(id, err as Error)
-			}
-			console.log('Sucess!')
-		}),
-		true
-	)
+	events.EXTRACT_MODS.subscribe(() => {
+		console.log(`Extracting BBMod '${id}'`)
+		try {
+			if (!installed) new Error('Mod is not installed!')
+			extract(extractContext)
+			installed = false
+		} catch (err) {
+			throw new BlockbenchModUninstallError(id, err as Error)
+		}
+		console.log('Sucess!')
+	})
 }
 
 /** Creates a new Blockbench.Action and automatically handles it's deletion on the plugin unload and uninstall events.
@@ -104,6 +118,22 @@ export function createAction(id: NamespacedString, options: ActionOptions) {
 }
 
 /**
+ * Creates a new Blockbench.ModelLoader and automatically handles it's deletion on the plugin unload and uninstall events.
+ * @param id A namespaced ID ('my-plugin-id:my-model-loader')
+ * @param options The options for the model loader.
+ * @returns The created model loader.
+ */
+export function createModelLoader(id: string, options: ModelLoaderOptions): ModelLoader {
+	const modelLoader = new ModelLoader(id, options)
+
+	events.EXTRACT_MODS.subscribe(() => {
+		modelLoader.delete()
+	}, true)
+
+	return modelLoader
+}
+
+/**
  * Creates a new Blockbench.Menu and automatically handles it's deletion on the plugin unload and uninstall events.
  * See https://www.blockbench.net/wiki/api/menu for more information on the Blockbench.Menu class.
  * @param template The menu template.
@@ -113,9 +143,9 @@ export function createAction(id: NamespacedString, options: ActionOptions) {
 export function createMenu(template: MenuItem[], options?: MenuOptions) {
 	const menu = new Menu(template, options)
 
-	events.EXTRACT_MODS.subscribe(() => {
-		menu.delete()
-	}, true)
+	// events.EXTRACT_MODS.subscribe(() => {
+	// 	menu.delete()
+	// }, true)
 
 	return menu
 }
@@ -134,9 +164,9 @@ export function createBarMenu(
 ) {
 	const menu = new BarMenu(id, structure, condition)
 
-	events.EXTRACT_MODS.subscribe(() => {
-		menu.delete()
-	}, true)
+	// events.EXTRACT_MODS.subscribe(() => {
+	// 	menu.delete()
+	// }, true)
 
 	return menu
 }
