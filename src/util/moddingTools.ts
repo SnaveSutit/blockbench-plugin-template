@@ -2,24 +2,7 @@ import { events } from './events'
 import { Subscribable } from './subscribable'
 
 export type NamespacedString = `${string}${string}:${string}${string}`
-/**
- * Shorthand to mark a context variable as a Property.
- *
- * ```
- * createBlockbenchMod(
- * 	'my-plugin-id:my-mod',
- * 	{
- * 		myProperty: undefined as ContextProperty<'string'>
- * 	},
- * 	context => {
- * 		context.myProperty = new Property(Cube, 'my_property', 'string', 'my_default_value')
- * 		return context
- * 	},
- * 	context => {
- * 		context.myProperty?.delete()
- * 	})
- * ```
- */
+// Useful for describing context variables that will become BlochBench class properties in the inject function.
 export type ContextProperty<Type extends keyof IPropertyType> = Property<Type> | undefined
 
 class BlockbenchModInstallError extends Error {
@@ -229,12 +212,39 @@ export function createPropertySubscribable<Value = any>(object: any, key: string
 				storage.value = newValue
 				onSet.dispatch({ storage, newValue })
 			},
+			configurable: true,
 		})
 
 		events.EXTRACT_MODS.subscribe(() => {
-			Object.defineProperty(object, key, {})
+			const value = object[key]
+			delete object[key]
+			Object.defineProperty(object, key, {
+				value,
+				configurable: true,
+			})
 		}, true)
 	}
 
 	return subscribables
 }
+
+// export function overwriteFunction<Target extends Record<string, any>, Key extends string>(
+// 	/**
+// 	 * The object or class to overwrite the function on.
+// 	 */
+// 	target: Target,
+// 	/**
+// 	 * The key of the function to overwrite.
+// 	 */
+// 	key: string,
+// 	/**
+// 	 * The function to overwrite the original function with.
+// 	 */
+// 	callback: (target: Target, originalFunction: Target[Key]) => void,
+// 	/**
+// 	 * The priority of the overwrite. Higher priority overwrites are called first.
+// 	 */
+// 	priority?: number
+// ) {
+// 	//
+// }
