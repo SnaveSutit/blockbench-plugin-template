@@ -7,5 +7,5 @@ new SvelteDialog({
 	title: 'Example Dialog',
 	width: 400,
 	svelteComponent: ExampleSvelteComponent,
-	svelteComponentProps: {},
+	svelteComponentProperties: {},
 })
