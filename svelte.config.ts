@@ -1,8 +1,9 @@
 import { resolve } from 'path'
 import prep from 'svelte-preprocess'
 import { typescript } from 'svelte-preprocess-esbuild'
+import { CompileOptions } from 'svelte/types/compiler'
 
-export const compilerOptions = {
+export const compilerOptions: CompileOptions = {
 	dev: process.env.NODE_ENV === 'development',
 	css: true,
 }

@@ -10,6 +10,8 @@ import { readFile } from 'fs/promises'
 import { preprocess, compile } from 'svelte/compiler'
 import { relative } from 'path'
 import { Plugin } from 'esbuild'
+import type { CompileOptions } from 'svelte/types/compiler'
+import { PreprocessorGroup } from 'svelte-preprocess/dist/types'
 /**
  * Convert a warning or error emitted from the svelte compiler for esbuild.
  */
@@ -28,11 +30,16 @@ function convertWarning(source: any, { message, filename, start, end }: any) {
 	}
 	return { text: message, location }
 }
+export type SveltePluginOptions = {
+	compilerOptions?: CompileOptions
+	transformCssToJs?: (css: string) => string
+	preprocess?: PreprocessorGroup | PreprocessorGroup[]
+}
 function esbuildPluginSvelte(
-	opts: any = {
-		transformCssToJs: (css: string) => css,
-	}
+	opts: SveltePluginOptions = {}
 ): Plugin {
+	// moving this out of the initializer to allow ommitting it from the options.
+	const completeOptions = Object.assign({ transformCssToJs: (css: string) => css }, opts)
 	return {
 		name: 'esbuild-plugin-svelte',
 		setup(build) {
@@ -49,15 +56,15 @@ function esbuildPluginSvelte(
 			build.onLoad({ filter: /\.svelte$/ }, async ({ path }) => {
 				let source = await readFile(path, 'utf-8')
 				const filename = relative(process.cwd(), path)
-				if (opts.preprocess) {
-					const processed = await preprocess(source, opts.preprocess, {
+				if (completeOptions.preprocess) {
+					const processed = await preprocess(source, completeOptions.preprocess, {
 						filename,
 					})
 					source = processed.code
 				}
 				const compilerOptions = {
 					css: false,
-					...opts.compilerOptions,
+					...completeOptions.compilerOptions,
 				}
 				let res
 				try {
@@ -68,8 +75,8 @@ function esbuildPluginSvelte(
 				const { js, css, warnings } = res
 				let code = `${js.code as string}\n//# sourceMappingURL=${js.map.toUrl() as string}`
 				// Emit CSS, otherwise it will be included in the JS and injected at runtime.
-				if (css.code && opts.transformCssToJs) {
-					code = `${code}\n${opts.transformCssToJs(css.code) as string}`
+				if (css.code && completeOptions.transformCssToJs) {
+					code = `${code}\n${completeOptions.transformCssToJs(css.code as string)}`
 				} else if (css.code && !compilerOptions.css) {
 					const cssPath = `${path}.css`
 					cache.set(
