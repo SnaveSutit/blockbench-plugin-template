@@ -101,6 +101,107 @@ export function createAction(id: NamespacedString, options: ActionOptions) {
 }
 
 /**
+ * Creates a new Blockbench.NumSlider and automatically handles it's deletion on the plugin unload and uninstall events.
+ * @param id A namespaced ID ('my-plugin-id:my-num-slider')
+ * @param options The options for the num slider.
+ * @returns The created num slider.
+ */
+export function createNumSlider(id: NamespacedString, options: NumSliderOptions) {
+	const numSlider = new NumSlider(id, options)
+
+	events.EXTRACT_MODS.subscribe(() => {
+		numSlider.delete()
+	}, true)
+
+	return numSlider
+}
+
+/**
+ * Creates a new Blockbench.BarSlider and automatically handles it's deletion on the plugin unload and uninstall events.
+ * @param id A namespaced ID ('my-plugin-id:my-bar-slider')
+ * @param options The options for the bar slider.
+ * @returns The created bar slider.
+ */
+export function createBarSlider(id: NamespacedString, options: NumSliderOptions) {
+	const barSlider = new BarSlider(id, options)
+
+	events.EXTRACT_MODS.subscribe(() => {
+		barSlider.delete()
+	}, true)
+
+	return barSlider
+}
+
+/**
+ * Creates a new Blockbench.BarSelect and automatically handles it's deletion on the plugin unload and uninstall events.
+ * @param id A namespaced ID ('my-plugin-id:my-bar-select')
+ * @param options The options for the bar select.
+ * @returns The created bar select.
+ */
+export function createBarSelect<T>(id: NamespacedString, options: BarSelectOptions<T>) {
+	const barSelect = new BarSelect(id, options)
+
+	events.EXTRACT_MODS.subscribe(() => {
+		barSelect.delete()
+	}, true)
+
+	return barSelect
+}
+
+/**
+ * Creates a new Blockbench.Toggle and automatically handles it's deletion on the plugin unload and uninstall events.
+ * @param id A namespaced ID ('my-plugin-id:my-toggle')
+ * @param options The options for the toggle.
+ * @returns The created toggle.
+ */
+export function createToggle(id: NamespacedString, options: ToggleOptions) {
+	const barSelect = new Toggle(id, options)
+
+	events.EXTRACT_MODS.subscribe(() => {
+		barSelect.delete()
+	}, true)
+
+	return barSelect
+}
+
+/**
+ * Creates a new Blockbench.BarText and automatically handles it's deletion on the plugin unload and uninstall events.
+ * @param id A namespaced ID ('my-plugin-id:my-BarText')
+ * @param options The options for the BarText.
+ * @returns The created BarText.
+ */
+export function createBarText(
+	id: NamespacedString,
+	options: WidgetOptions & {
+		text: string
+	}
+) {
+	const barSelect = new BarText(id, options)
+
+	events.EXTRACT_MODS.subscribe(() => {
+		barSelect.delete()
+	}, true)
+
+	return barSelect
+}
+
+/**
+ * Creates a new Blockbench.ColorPicker and automatically handles it's deletion on the plugin unload and uninstall events.
+ * @param id A namespaced ID ('my-plugin-id:my-color-picker')
+ * @param options The options for the color picker.
+ * @returns The created color picker.
+ */
+export function createColorPicker(id: NamespacedString, options: ColorPickerOptions) {
+	const barSelect = new ColorPicker(id, options)
+
+	events.EXTRACT_MODS.subscribe(() => {
+		barSelect.delete()
+	}, true)
+
+	return barSelect
+}
+
+/**
  * Creates a new Blockbench.ModelLoader and automatically handles it's deletion on the plugin unload and uninstall events.
  * @param id A namespaced ID ('my-plugin-id:my-model-loader')
  * @param options The options for the model loader.
