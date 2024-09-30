@@ -1,5 +1,5 @@
-import PACKAGE from '../package.json'
-import { createBlockbenchMod } from './util/moddingTools'
+import PACKAGE from '../../package.json'
+import { createBlockbenchMod } from '../util/moddingTools'
 
 // This is a simple example of how to use createBlockbenchMod.
 // This mod will log 'Hello world!' to the console when you click the 'Add Cube' button.

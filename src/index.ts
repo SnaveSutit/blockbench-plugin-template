@@ -5,13 +5,16 @@ import './util/moddingTools'
 //-------------------------------
 // Import your source files here
 //-------------------------------
-import './dialogs/exampleDialog'
+// Dialogs
+import { openExampleDialog } from './dialogs/exampleDialog'
+// Mods
+import './mods/exampleMod'
 
-// Expose this plugin's events globally and to other plugins
-// Replace 'BlockbenchPluginTemplate' here, and in globals.d.ts with the name of your plugin
-// @ts-ignore
-globalThis.BlockbenchPluginTemplate = {
+// Provide a global object for other plugins to interact with
+// @ts-expect-error
+window[PACKAGE.name] = {
 	events: events,
+	openExampleDialog,
 }
 
 BBPlugin.register(PACKAGE.name, {
