@@ -1,8 +1,9 @@
-import { consoleGroup } from './console'
-import * as events from './events'
+import { events } from './events'
 import { Subscribable } from './subscribable'
 
 export type NamespacedString = `${string}${string}:${string}${string}`
+// Useful for describing context variables that will become BlochBench class properties in the inject function.
+export type ContextProperty<Type extends keyof IPropertyType> = Property<Type> | undefined
 
 class BlockbenchModInstallError extends Error {
 	constructor(id: string, err: Error) {
@@ -58,33 +59,29 @@ export function createBlockbenchMod<InjectContext = any, ExtractContext = any>(
 	let installed = false
 	let extractContext: ExtractContext
 
-	events.INJECT_MODS.subscribe(
-		consoleGroup(`Injecting BBMod '${id}'`, () => {
-			try {
-				if (installed) new Error('Mod is already installed!')
-				extractContext = inject(context)
-				installed = true
-			} catch (err) {
-				throw new BlockbenchModInstallError(id, err as Error)
-			}
-			console.log('Sucess!')
-		}),
-		true
-	)
+	events.INJECT_MODS.subscribe(() => {
+		console.log(`Injecting BBMod '${id}'`)
+		try {
+			if (installed) new Error('Mod is already installed!')
+			extractContext = inject(context)
+			installed = true
+		} catch (err) {
+			throw new BlockbenchModInstallError(id, err as Error)
+		}
+		console.log('Sucess!')
+	})
 
-	events.EXTRACT_MODS.subscribe(
-		consoleGroup(`Extracting BBMod '${id}'`, () => {
-			try {
-				if (!installed) new Error('Mod is not installed!')
-				extract(extractContext)
-				installed = false
-			} catch (err) {
-				throw new BlockbenchModUninstallError(id, err as Error)
-			}
-			console.log('Sucess!')
-		}),
-		true
-	)
+	events.EXTRACT_MODS.subscribe(() => {
+		console.log(`Extracting BBMod '${id}'`)
+		try {
+			if (!installed) new Error('Mod is not installed!')
+			extract(extractContext)
+			installed = false
+		} catch (err) {
+			throw new BlockbenchModUninstallError(id, err as Error)
+		}
+		console.log('Sucess!')
+	})
 }
 
 /** Creates a new Blockbench.Action and automatically handles it's deletion on the plugin unload and uninstall events.
@@ -104,6 +101,22 @@ export function createAction(id: NamespacedString, options: ActionOptions) {
 }
 
 /**
+ * Creates a new Blockbench.ModelLoader and automatically handles it's deletion on the plugin unload and uninstall events.
+ * @param id A namespaced ID ('my-plugin-id:my-model-loader')
+ * @param options The options for the model loader.
+ * @returns The created model loader.
+ */
+export function createModelLoader(id: string, options: ModelLoaderOptions): ModelLoader {
+	const modelLoader = new ModelLoader(id, options)
+
+	events.EXTRACT_MODS.subscribe(() => {
+		modelLoader.delete()
+	}, true)
+
+	return modelLoader
+}
+
+/**
  * Creates a new Blockbench.Menu and automatically handles it's deletion on the plugin unload and uninstall events.
  * See https://www.blockbench.net/wiki/api/menu for more information on the Blockbench.Menu class.
  * @param template The menu template.
@@ -113,9 +126,9 @@ export function createAction(id: NamespacedString, options: ActionOptions) {
 export function createMenu(template: MenuItem[], options?: MenuOptions) {
 	const menu = new Menu(template, options)
 
-	events.EXTRACT_MODS.subscribe(() => {
-		menu.delete()
-	}, true)
+	// events.EXTRACT_MODS.subscribe(() => {
+	// 	menu.delete()
+	// }, true)
 
 	return menu
 }
@@ -134,9 +147,9 @@ export function createBarMenu(
 ) {
 	const menu = new BarMenu(id, structure, condition)
 
-	events.EXTRACT_MODS.subscribe(() => {
-		menu.delete()
-	}, true)
+	// events.EXTRACT_MODS.subscribe(() => {
+	// 	menu.delete()
+	// }, true)
 
 	return menu
 }
@@ -153,21 +166,21 @@ const SUBSCRIBABLES = new Map<
 >()
 
 /**
- * Creates a subscribable for a variable on an object.
+ * Creates a subscribable for a property on an object.
  * @param object The object to create the subscribable for.
- * @param key The key of the variable on the object.
+ * @param key The key of the property on the object.
  * @returns A tuple of {@link Subscribable | Subscribables} [onGet, onSet]
  * @example
  * Using the subscribables as simple events.
  * ```ts
- * const [onGet, onSet] = createVariableSubscribable(Blockbench, 'version')
+ * const [onGet, onSet] = createPropertySubscribable(Blockbench, 'version')
  * onGet.subscribe(({ value }) => console.log('Blockbench version:', value))
  * onSet.subscribe(({ newValue }) => console.log('Blockbench version changed to:', newValue))
  * ```
  * @example
- * Using the subscribables to change the value of a variable.
+ * Using the subscribables to change the value of a Property.
  * ```ts
- * const [, onSet] = createVariableSubscribable(Blockbench, 'version')
+ * const [, onSet] = createPropertySubscribable(Blockbench, 'version')
  * onSet.subscribe(({ storage, newValue }) => {
  * 	if (newValue === '1.0.0') storage.value = '1.0.1'
  * })
@@ -177,7 +190,7 @@ const SUBSCRIBABLES = new Map<
 
  * The Getter can also modify `storage.value`, but this is not recommended.
  */
-export function createVariableSubscribable<Value = any>(object: any, key: string) {
+export function createPropertySubscribable<Value = any>(object: any, key: string) {
 	let subscribables = SUBSCRIBABLES.get(object)
 	const storage: Storage<Value> = { value: object[key] }
 
@@ -199,12 +212,39 @@ export function createVariableSubscribable<Value = any>(object: any, key: string
 				storage.value = newValue
 				onSet.dispatch({ storage, newValue })
 			},
+			configurable: true,
 		})
 
 		events.EXTRACT_MODS.subscribe(() => {
-			Object.defineProperty(object, key, {})
+			const value = object[key]
+			delete object[key]
+			Object.defineProperty(object, key, {
+				value,
+				configurable: true,
+			})
 		}, true)
 	}
 
 	return subscribables
 }
+
+// export function overwriteFunction<Target extends Record<string, any>, Key extends string>(
+// 	/**
+// 	 * The object or class to overwrite the function on.
+// 	 */
+// 	target: Target,
+// 	/**
+// 	 * The key of the function to overwrite.
+// 	 */
+// 	key: string,
+// 	/**
+// 	 * The function to overwrite the original function with.
+// 	 */
+// 	callback: (target: Target, originalFunction: Target[Key]) => void,
+// 	/**
+// 	 * The priority of the overwrite. Higher priority overwrites are called first.
+// 	 */
+// 	priority?: number
+// ) {
+// 	//
+// }

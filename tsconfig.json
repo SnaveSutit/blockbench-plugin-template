@@ -1,12 +1,13 @@
 {
+	"include": ["./src/**/*","./tools/**/*"],
 	"compilerOptions": {
 		"outDir": "./dist/",
 		"noImplicitAny": true,
-		"module": "es2022",
+		"module": "ES2022",
 		"target": "ES2022",
 		"moduleResolution": "node",
 		"strict": true,
-		"types": ["node", "blockbench-types"],
+		"types": ["node", "blockbench-types", "svelte"],
 		"resolveJsonModule": true,
 		"allowSyntheticDefaultImports": true
 	}

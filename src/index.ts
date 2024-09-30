@@ -1,13 +1,14 @@
 import * as PACKAGE from '../package.json'
-import { consoleGroupCollapsed } from './util/console'
-import * as events from './util/events'
+import { events } from './util/events'
 import './util/moddingTools'
 
 //-------------------------------
 // Import your source files here
 //-------------------------------
+import './dialogs/exampleDialog'
 
 // Expose this plugin's events globally and to other plugins
+// Replace 'BlockbenchPluginTemplate' here, and in globals.d.ts with the name of your plugin
 // @ts-ignore
 globalThis.BlockbenchPluginTemplate = {
 	events: events,
@@ -22,16 +23,16 @@ BBPlugin.register(PACKAGE.name, {
 	version: PACKAGE.version,
 	min_version: PACKAGE.min_blockbench_version,
 	tags: PACKAGE.tags as [string, string, string],
-	onload: consoleGroupCollapsed(`${PACKAGE.name}:onload`, () => {
+	onload() {
 		events.LOAD.dispatch()
-	}),
-	onunload: consoleGroupCollapsed(`${PACKAGE.name}:onunload`, () => {
+	},
+	onunload() {
 		events.UNLOAD.dispatch()
-	}),
-	oninstall: consoleGroupCollapsed(`${PACKAGE.name}:oninstall`, () => {
+	},
+	oninstall() {
 		events.INSTALL.dispatch()
-	}),
-	onuninstall: consoleGroupCollapsed(`${PACKAGE.name}:onuninstall`, () => {
+	},
+	onuninstall() {
 		events.UNINSTALL.dispatch()
-	}),
+	},
 })

@@ -1,4 +1,3 @@
-import { consoleGroupCollapsed } from './console'
 import { Subscribable } from './subscribable'
 import * as PACKAGE from '../../package.json'
 
@@ -11,23 +10,37 @@ export class PluginEvent<EventData = void> extends Subscribable<EventData> {
 }
 
 // Plugin Events
-export const LOAD = new PluginEvent('load')
-export const UNLOAD = new PluginEvent('unload')
-export const INSTALL = new PluginEvent('install')
-export const UNINSTALL = new PluginEvent('uninstall')
+export const events = {
+	LOAD: new PluginEvent('load'),
+	UNLOAD: new PluginEvent('unload'),
+	INSTALL: new PluginEvent('install'),
+	UNINSTALL: new PluginEvent('uninstall'),
 
-export const INJECT_MODS = new PluginEvent('injectMods')
-export const EXTRACT_MODS = new PluginEvent('extractMods')
+	INJECT_MODS: new PluginEvent('injectMods'),
+	EXTRACT_MODS: new PluginEvent('extractMods'),
 
-const INJECT_HANDLER = consoleGroupCollapsed(
-	`Injecting BlockbenchMods added by ${PACKAGE.name}`,
-	() => INJECT_MODS.dispatch()
-)
-const EXTRACT_HANDLER = consoleGroupCollapsed(
-	`Extracting BlockbenchMods added by ${PACKAGE.name}`,
-	() => EXTRACT_MODS.dispatch()
-)
-LOAD.subscribe(INJECT_HANDLER)
-UNLOAD.subscribe(EXTRACT_HANDLER)
-INSTALL.subscribe(INJECT_HANDLER)
-UNINSTALL.subscribe(EXTRACT_HANDLER)
+	SELECT_PROJECT: new PluginEvent<ModelProject>('selectProject'),
+	UNSELECT_PROJECT: new PluginEvent<ModelProject>('deselectProject'),
+}
+
+function injectionHandler() {
+	console.log(`Injecting BlockbenchMods added by '${PACKAGE.name}'`)
+	events.INJECT_MODS.dispatch()
+}
+
+function extractionHandler() {
+	console.log(`Extracting BlockbenchMods added by '${PACKAGE.name}'`)
+	events.EXTRACT_MODS.dispatch()
+}
+
+events.LOAD.subscribe(injectionHandler)
+events.UNLOAD.subscribe(extractionHandler)
+events.INSTALL.subscribe(injectionHandler)
+events.UNINSTALL.subscribe(extractionHandler)
+
+Blockbench.on<EventName>('select_project', ({ project }: { project: ModelProject }) => {
+	events.SELECT_PROJECT.dispatch(project)
+})
+Blockbench.on<EventName>('unselect_project', ({ project }: { project: ModelProject }) => {
+	events.UNSELECT_PROJECT.dispatch(project)
+})
