@@ -1,6 +1,6 @@
-import PACKAGE from '../../package.json'
-import ExampleSvelteComponent from '../components/exampleComponent.svelte'
-import { SvelteDialog } from '../util/svelteDialog'
+import PACKAGE from '../../../package.json'
+import { SvelteDialog } from '../../util/svelteDialog'
+import ExampleSvelteComponent from './exampleComponent.svelte'
 
 export function openExampleDialog() {
 	new SvelteDialog({

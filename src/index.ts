@@ -5,10 +5,11 @@ import './util/moddingTools'
 //-------------------------------
 // Import your source files here
 //-------------------------------
-// Dialogs
-import { openExampleDialog } from './dialogs/exampleDialog'
+
+// Svelte
+import { openExampleDialog } from './svelte/exampleDialog'
 // Mods
-import './mods/exampleMod'
+import './mods'
 
 // Provide a global object for other plugins to interact with
 // @ts-expect-error
