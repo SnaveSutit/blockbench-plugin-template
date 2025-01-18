@@ -16,6 +16,7 @@ import sveltePlugin from './plugins/sveltePlugin'
 import svelteConfig from '../svelte.config.js'
 import inlineImage from 'esbuild-plugin-inline-image'
 import ImportGlobPlugin from 'esbuild-plugin-import-glob'
+import packagerPlugin from './plugins/packagePlugin'
 
 const PACKAGE = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
 
@@ -130,6 +131,7 @@ async function buildDev() {
 			INFO_PLUGIN,
 			sveltePlugin(svelteConfig),
 			yamlPlugin({}),
+			packagerPlugin(),
 		],
 		format: 'iife',
 		define: DEFINES,
@@ -155,6 +157,7 @@ function buildProd() {
 				INFO_PLUGIN,
 				sveltePlugin(svelteConfig),
 				yamlPlugin({}),
+				packagerPlugin(),
 			],
 			// Disabling this will reduce file size, but make bugs much harder to track down.
 			keepNames: true,

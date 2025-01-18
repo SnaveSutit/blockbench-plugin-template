@@ -1,0 +1,17 @@
+{
+	"1.0.0": {
+		"title": "v1.0.0",
+		"author": "You!",
+		"date": "2025-01-08",
+		"categories": [
+			{
+				"title": "Changes",
+				"list": ["Created the plugin!"]
+			},
+			{
+				"title": "Fixes",
+				"list": ["Fixed the plugin not existing!"]
+			}
+		]
+	}
+}
