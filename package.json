@@ -22,9 +22,8 @@
 	"types": "./dist/src/index.d.ts",
 	"private": true,
 	"scripts": {
-		"build:scripts": "esbuild --bundle --platform=node --outfile=dist/build.cjs --packages=external ./tools/esbuild.ts",
-		"dev": "yarn build:scripts && node ./dist/build.cjs --mode=dev",
-		"build": "yarn build:scripts && node ./dist/build.cjs",
+		"dev": "tsx ./tools/esbuild.ts --mode=dev",
+		"build": "tsx ./tools/esbuild.ts",
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
