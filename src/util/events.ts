@@ -1,5 +1,5 @@
-import { Subscribable } from './subscribable'
 import * as PACKAGE from '../../package.json'
+import { Subscribable } from './subscribable'
 
 export class PluginEvent<EventData = void> extends Subscribable<EventData> {
 	protected static events: Record<string, PluginEvent<any>> = {}
@@ -24,13 +24,15 @@ export const events = {
 }
 
 function injectionHandler() {
-	console.log(`Injecting BlockbenchMods added by '${PACKAGE.name}'`)
+	console.groupCollapsed(`Injecting BlockbenchMods added by '${PACKAGE.name}'`)
 	events.INJECT_MODS.dispatch()
+	console.groupEnd()
 }
 
 function extractionHandler() {
-	console.log(`Extracting BlockbenchMods added by '${PACKAGE.name}'`)
+	console.groupCollapsed(`Extracting BlockbenchMods added by '${PACKAGE.name}'`)
 	events.EXTRACT_MODS.dispatch()
+	console.groupEnd()
 }
 
 events.LOAD.subscribe(injectionHandler)
