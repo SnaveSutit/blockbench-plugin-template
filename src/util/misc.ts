@@ -118,3 +118,9 @@ export function makeNotValueable<O extends Record<string, Valuable<any>>>(obj: O
 		[Key in keyof O]: ReturnType<O[Key]['get']>
 	}
 }
+
+export function resetAllConsoleGroups() {
+	for (let i = 0; i < 1000; i++) {
+		console.groupEnd()
+	}
+}
