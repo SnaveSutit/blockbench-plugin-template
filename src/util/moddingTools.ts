@@ -68,7 +68,6 @@ export function createBlockbenchMod<InjectContext = any, ExtractContext = any>(
 		} catch (err) {
 			throw new BlockbenchModInstallError(id, err as Error)
 		}
-		console.log('Sucess!')
 	})
 
 	events.EXTRACT_MODS.subscribe(() => {
@@ -80,7 +79,6 @@ export function createBlockbenchMod<InjectContext = any, ExtractContext = any>(
 		} catch (err) {
 			throw new BlockbenchModUninstallError(id, err as Error)
 		}
-		console.log('Sucess!')
 	})
 }
 
