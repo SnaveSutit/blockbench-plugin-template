@@ -7,11 +7,11 @@
 		"Tag B",
 		"Tag C"
 	],
-	"min_blockbench_version": "4.2.0",
+	"min_blockbench_version": "5.1.4",
 	"author": {
 		"name": "SnaveSutit",
 		"email": "snavesutit@gmail.com",
-		"url": "https://discordapp.com/users/213746232923783168"
+		"url": "https://snavesutit.github.io/"
 	},
 	"repository": {
 		"type": "github",
@@ -24,6 +24,7 @@
 	"scripts": {
 		"dev": "tsx .scripts/esbuild.ts --mode=dev",
 		"build": "tsx .scripts/esbuild.ts",
+		"test": "vitest",
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
@@ -55,9 +56,7 @@
 		"typescript": "^5.5.3",
 		"typescript-eslint": "^8.59.1",
 		"vitest": "^4.1.5",
-		"vue": "2.7.14"
-	},
-	"dependencies": {
+		"vue": "2.7.14",
 		"js-yaml": "^4.1.0"
 	},
 	"license": "MIT"
