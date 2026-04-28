@@ -1,9 +1,4 @@
-import { ComponentConstructorOptions } from 'svelte'
-import { Valuable } from './stores'
-
-export type SvelteComponentConstructor<T, U extends ComponentConstructorOptions> = new (
-	options: U
-) => T
+import { type Observable, observable } from 'svelte-observable-store'
 
 /**
  * Rounds a number to a certain number of decimal places
@@ -107,13 +102,13 @@ export function markdownToHTML(markdown: string) {
 		.replace(/`(.+?)`/, '<code class="animated-java-code">$1</code>')
 }
 
-export function makeValuable<O extends Record<string, any>>(obj: O) {
-	return mapObjEntries(obj, (k, v) => [k, new Valuable(v)]) as {
-		[Key in keyof O]: Valuable<O[Key]>
+export function makeObjectObservable<O extends Record<string, any>>(obj: O) {
+	return mapObjEntries(obj, (k, v) => [k, observable(v)]) as {
+		[Key in keyof O]: Observable<O[Key]>
 	}
 }
 
-export function makeNotValueable<O extends Record<string, Valuable<any>>>(obj: O) {
+export function unmakeObjectObservable<O extends Record<string, Observable<any>>>(obj: O) {
 	return mapObjEntries(obj, (k, v) => [k, v.get()]) as {
 		[Key in keyof O]: ReturnType<O[Key]['get']>
 	}

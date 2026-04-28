@@ -1,20 +1,17 @@
 import * as PACKAGE from '../package.json'
-import { events } from './util/events'
-import './util/moddingTools'
 
 //-------------------------------
 // Import your source files here
 //-------------------------------
 
-// Svelte
-import { openExampleDialog } from './svelte/exampleDialog'
-// Mods
-import './mods'
+// Blockbench Patches
+import 'import_folder_recursive:./patches'
+// Misc imports
+import { openExampleDialog } from './dialogs/exampleDialog'
 
 // Provide a global object for other plugins to interact with
 // @ts-expect-error
 window[PACKAGE.name] = {
-	events: events,
 	openExampleDialog,
 }
 
@@ -27,16 +24,8 @@ BBPlugin.register(PACKAGE.name, {
 	version: PACKAGE.version,
 	min_version: PACKAGE.min_blockbench_version,
 	tags: PACKAGE.tags as [string, string, string],
-	onload() {
-		events.LOAD.dispatch()
-	},
-	onunload() {
-		events.UNLOAD.dispatch()
-	},
-	oninstall() {
-		events.INSTALL.dispatch()
-	},
-	onuninstall() {
-		events.UNINSTALL.dispatch()
-	},
+	onload() {},
+	onunload() {},
+	oninstall() {},
+	onuninstall() {},
 })

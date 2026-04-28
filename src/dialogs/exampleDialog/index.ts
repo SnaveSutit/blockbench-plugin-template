@@ -1,6 +1,6 @@
+import { SvelteDialog } from 'svelte-patching-tools/blockbench'
 import PACKAGE from '../../../package.json'
-import { SvelteDialog } from '../../util/svelteDialog'
-import ExampleSvelteComponent from './exampleComponent.svelte'
+import ExampleSvelteComponent from './exampleDialog.svelte'
 
 export function openExampleDialog() {
 	new SvelteDialog({

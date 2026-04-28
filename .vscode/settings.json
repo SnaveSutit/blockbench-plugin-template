@@ -1,0 +1,44 @@
+{
+	"eslint.enable": true,
+	"editor.formatOnSave": true,
+	"prettier.enable": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit",
+		"source.fixAll.ts": "explicit",
+		"source.fixAll.sortJSON": "explicit",
+		"source.addMissingImports.ts": "explicit",
+		"source.organizeImports": "explicit",
+		"source.sortImports": "explicit",
+		"source.removeUnused.ts": "never",
+		"source.removeUnusedImports": "explicit",
+		"source.organizeLinkDefinitions": "explicit"
+	},
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/CVS": true,
+		"**/.DS_Store": true,
+		"**/Thumbs.db": true,
+		"**/node_modules": true
+	},
+	"npm.exclude": ["**/node_modules"],
+	"errorLens.excludePatterns": ["**/node_modules/**/*"],
+	"eslint.validate": ["javascript", "typescript", "svelte"],
+	"eslint.useFlatConfig": true,
+	"eslint.problems.shortenToSingleLine": true,
+	"workbench.colorCustomizations": {
+		"editorGroupHeader.tabsBorder": "#000000",
+		"commandCenter.foreground": "#ffffffdd",
+		"commandCenter.background": "#00000077",
+		"commandCenter.border": "#000000"
+	},
+	"svelte.plugin.svelte.compilerWarnings": {
+		"a11y_click_events_have_key_events": "ignore",
+		"a11y_no_static_element_interactions": "ignore"
+	},
+	"mc-dp-icons.enableNamespaceIcons": false,
+	"mc-dp-icons.enableChristmasIcons": "Disable",
+	"mc-dp-icons.enableLoadTickAutoChange": false
+}
