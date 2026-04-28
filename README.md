@@ -1,27 +1,41 @@
 # Blockbench Plugin Template
-A TypeScript & ESBuild Blockbench plugin template.
 
-Includes everything you need to get started and more with Blockbench plugin development!
+A TypeScript-first Blockbench plugin template with ESBuild, Svelte, and plugin packaging utilities preconfigured.
 
-## Utilities
-- SnaveSutit/blockbench-types - The most up-to-date Blockbench types available, improvements and fixes almost every week!
+## Included tooling
 
-- util/console - Adds a couple functions for wrapping the console output of a function in a console group without having to remember to open and close it properly.
+- TypeScript 5 + `blockbench-types`
+- ESBuild bundling with watch/dev and production modes
+- Svelte support via `svelte-patching-tools` + `esbuild-plugin-svelte`
+- Blockbench patch workflow via `blockbench-patch-manager`
+- YAML language file loading (`src/lang/*.yml`) through build plugins
+- ESLint (TypeScript + Svelte) and Prettier
+- Vitest config (tests expected in `src/tests`)
+- A pluginPackage build step that generates all of the necessary files for publishing a plugin to the Blockbench plugin repository.
 
-- util/subscribable - A simple typed subscribable class.
+## Quick start
 
-- util/moddingTools - A library of tools that make modding Blockbench much easier. From the simple action of creating an .. Action, to the advanced trickery of injecting custom code into built-in class functions. This library will be super helpful to practically anyone attempting to build a plugin!
+1. Use this template to create your repository.
+2. Install dependencies:
+    - `bun install`
+3. Update plugin metadata in `package.json` (`name`, `title`, `author`, versions, tags).
+4. Edit plugin registration and lifecycle in `src/index.ts`.
+5. Rename your global plugin type in `src/global.d.ts` to match your plugin name.
 
-- util/events - A simple event manager. that provides much better type completion than the built-in one in Blockbench.
+## Commands
 
-## Setup
-- Create a new repo using this template
-- Run `yarn` to initialize the development enviornment
-- Configure the package.json to use your information
-- Configure the plugin definition in `index.ts`
-- Rename the global variable in `global.d.ts` to match your plugin's name
+- `bun dev` - Development build with file watching
+- `bun build` - Production build
+- `bun test` - Run tests
+- `bun format` - Format all files with Prettier
 
-## Build commands
-- `yarn build:dev` - Builds in dev mode and watches for file changes
-- `yarn build:prod` - Builds a production version of the plugin and exits
-- `yarn format` - Formats all of the source files using Prettier
+## Build output
+
+- Main bundle: `dist/<package.name>.js`
+- Plugin Package: `dist/pluginPackage/<package.name>.bbpack`
+- Production metadata: `dist/meta.json`
+
+## Notes
+
+- The plugin is registered from `src/plugin.ts` and has a global object on `window[PACKAGE.name]` for inter-plugin integrations.
+- The build uses environment defines (`process.env.*`) and defaults `FLAVOR=local` when not set.
